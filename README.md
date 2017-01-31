@@ -1,14 +1,17 @@
-# opsdroid connector shell
+# opsdroid connector telegram
 
-A connector for [opsdroid](https://github.com/opsdroid/opsdroid) to send messages using the command line.
+A connector for [opsdroid](https://github.com/opsdroid/opsdroid) to send messages using [Telegram](https://telegram.org/).
 
 ## Requirements
 
-The shell connector requires access to user input, this cannot be done in multiprocessing mode. Therefore it must be the only connector in the configuration.
+You need to [register a bot](https://core.telegram.org/bots) on Telegram and get an api token for it.
 
 ## Configuration
 
-None.
+connectors:
+  - name: slack
+    # required
+    token: "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ-ZYXWVUT"
 
 ## License
 
