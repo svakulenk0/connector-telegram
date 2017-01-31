@@ -8,10 +8,12 @@ You need to [register a bot](https://core.telegram.org/bots) on Telegram and get
 
 ## Configuration
 
+```yaml
 connectors:
   - name: slack
     # required
     token: "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ-ZYXWVUT"
+```
 
 ## License
 
