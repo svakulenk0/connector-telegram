@@ -18,6 +18,7 @@ class ConnectorTelegram(Connector):
         self.name = "telegram"
         self.token = config["token"]
         self.latest_update = None
+        self.default_room = None
         self.whitelisted_users = config.get("whitelisted_users", None)
 
     def build_url(self, method):
@@ -28,10 +29,15 @@ class ConnectorTelegram(Connector):
         _LOGGER.debug("Connecting to telegram")
         async with aiohttp.ClientSession() as session:
             async with session.get(self.build_url("getMe")) as resp:
-                json = await resp.json()
-                _LOGGER.debug(json)
-                _LOGGER.debug("Connected to telegram as %s",
-                              json["result"]["username"])
+                if resp.status != 200:
+                    _LOGGER.error("Unable to connect")
+                    _LOGGER.error("Telegram error %s, %s",
+                                  resp.status, resp.text())
+                else:
+                    json = await resp.json()
+                    _LOGGER.debug(json)
+                    _LOGGER.debug("Connected to telegram as %s",
+                                  json["result"]["username"])
 
     async def listen(self, opsdroid):
         """Listen for new message."""
@@ -55,14 +61,19 @@ class ConnectorTelegram(Connector):
                             if self.latest_update is None or \
                                     self.latest_update <= response["update_id"]:
                                 self.latest_update = response["update_id"] + 1
-                            if "text" in response["message"] and \
-                                    (self.whitelisted_users is None or 
-                                     response["message"]["from"]["username"] in self.whitelisted_users):
+                            if "text" in response["message"]:
+                                if response["message"]["from"]["username"] == self.config.get("default_user", None):
+                                    self.default_room = response["message"]["chat"]["id"]
                                 message = Message(response["message"]["text"],
                                                   response["message"]["from"]["username"],
                                                   response["message"]["chat"],
                                                   self)
-                                await opsdroid.parse(message)
+                                if self.whitelisted_users is None or \
+                                        response["message"]["from"]["username"] in self.whitelisted_users:
+                                    await opsdroid.parse(message)
+                                else:
+                                    message.text = "Sorry you're not allowed to speak with this bot"
+                                    await self.respond(message)
 
                     await asyncio.sleep(0.5)
 
@@ -78,3 +89,5 @@ class ConnectorTelegram(Connector):
                                     data=data) as resp:
                 if resp.status == 200:
                     _LOGGER.debug("Successfully responded")
+                else:
+                    _LOGGER.error("Unable to responded")
