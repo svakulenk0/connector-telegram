@@ -18,6 +18,7 @@ class ConnectorTelegram(Connector):
         self.name = "telegram"
         self.token = config["token"]
         self.latest_update = None
+        self.whitelisted_users = config.get("whitelisted_users", None)
 
     def build_url(self, method):
         return "https://api.telegram.org/bot{}/{}".format(self.token, method)
@@ -54,7 +55,9 @@ class ConnectorTelegram(Connector):
                             if self.latest_update is None or \
                                     self.latest_update <= response["update_id"]:
                                 self.latest_update = response["update_id"] + 1
-                            if "text" in response["message"]:
+                            if "text" in response["message"] and \
+                                    (self.whitelisted_users is None or 
+                                     response["message"]["from"]["username"] in self.whitelisted_users):
                                 message = Message(response["message"]["text"],
                                                   response["message"]["from"]["username"],
                                                   response["message"]["chat"],
