@@ -13,6 +13,10 @@ connectors:
   - name: telegram
     # required
     token: "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ-ZYXWVUT"
+    # optional
+    whitelisted_users:
+      - user1
+      - user2
 ```
 
 ## License
