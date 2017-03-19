@@ -12,9 +12,11 @@ You need to [register a bot](https://core.telegram.org/bots) on Telegram and get
 connectors:
   - name: telegram
     # required
-    token: "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ-ZYXWVUT"
+    token: "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ-ZYXWVUT"  # Telegraf bot token
     # optional
-    whitelisted_users:
+    update_interval: 0.5  # Interval between checking for messages
+    default_user: user1  # Default user to send messages to (overrides default room in connector)
+    whitelisted_users:  # List of users who can speak to the bot, if not set anyone can speak
       - user1
       - user2
 ```
