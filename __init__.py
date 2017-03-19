@@ -20,6 +20,7 @@ class ConnectorTelegram(Connector):
         self.latest_update = None
         self.default_room = None
         self.whitelisted_users = config.get("whitelisted_users", None)
+        self.update_interval = config.get("update_interval", 0.5)
 
     def build_url(self, method):
         return "https://api.telegram.org/bot{}/{}".format(self.token, method)
@@ -53,6 +54,7 @@ class ConnectorTelegram(Connector):
                                       resp.status, resp.text())
                     else:
                         json = await resp.json()
+                        _LOGGER.debug(json)
                         if len(json["result"]) > 0:
                             _LOGGER.debug("Received %i messages from telegram",
                                           len(json["result"]))
@@ -75,7 +77,7 @@ class ConnectorTelegram(Connector):
                                     message.text = "Sorry you're not allowed to speak with this bot"
                                     await self.respond(message)
 
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(self.update_interval)
 
 
     async def respond(self, message):
