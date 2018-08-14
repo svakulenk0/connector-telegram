@@ -80,7 +80,7 @@ class ConnectorTelegram(Connector):
                     await asyncio.sleep(self.update_interval)
 
 
-    async def respond(self, message):
+    async def respond(self, message, room=None):
         """Respond with a message."""
         _LOGGER.debug("Responding with: " + message.text)
         async with aiohttp.ClientSession() as session:
