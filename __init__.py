@@ -64,14 +64,14 @@ class ConnectorTelegram(Connector):
                                     self.latest_update <= response["update_id"]:
                                 self.latest_update = response["update_id"] + 1
                             if "text" in response["message"]:
-                                if response["message"]["from"]["username"] == self.config.get("default_user", None):
+                                if response["message"]["from"]["id"] == self.config.get("default_user", None):
                                     self.default_room = response["message"]["chat"]["id"]
                                 message = Message(response["message"]["text"],
-                                                  response["message"]["from"]["username"],
+                                                  response["message"]["from"]["id"],
                                                   response["message"]["chat"],
                                                   self)
                                 if self.whitelisted_users is None or \
-                                        response["message"]["from"]["username"] in self.whitelisted_users:
+                                        response["message"]["from"]["id"] in self.whitelisted_users:
                                     await opsdroid.parse(message)
                                 else:
                                     message.text = "Sorry you're not allowed to speak with this bot"
