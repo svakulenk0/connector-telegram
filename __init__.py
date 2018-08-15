@@ -63,19 +63,20 @@ class ConnectorTelegram(Connector):
                             if self.latest_update is None or \
                                     self.latest_update <= response["update_id"]:
                                 self.latest_update = response["update_id"] + 1
-                            if "text" in response["message"]:
-                                if response["message"]["from"]["id"] == self.config.get("default_user", None):
-                                    self.default_room = response["message"]["chat"]["id"]
-                                message = Message(response["message"]["text"],
-                                                  response["message"]["from"]["id"],
-                                                  response["message"]["chat"],
-                                                  self)
-                                if self.whitelisted_users is None or \
-                                        response["message"]["from"]["id"] in self.whitelisted_users:
-                                    await opsdroid.parse(message)
-                                else:
-                                    message.text = "Sorry you're not allowed to speak with this bot"
-                                    await self.respond(message)
+                            if "message" in response:
+                                if "text" in response["message"]:
+                                    if response["message"]["from"]["id"] == self.config.get("default_user", None):
+                                        self.default_room = response["message"]["chat"]["id"]
+                                    message = Message(response["message"]["text"],
+                                                      response["message"]["from"]["id"],
+                                                      response["message"]["chat"],
+                                                      self)
+                                    if self.whitelisted_users is None or \
+                                            response["message"]["from"]["id"] in self.whitelisted_users:
+                                        await opsdroid.parse(message)
+                                    else:
+                                        message.text = "Sorry you're not allowed to speak with this bot"
+                                        await self.respond(message)
 
                     await asyncio.sleep(self.update_interval)
 
